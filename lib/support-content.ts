@@ -186,8 +186,8 @@ export const quickPrompts = [
 export const statusCards: readonly StatusCard[] = [
   {
     label: "Mode",
-    value: "Policy-guided demo",
-    detail: "Runs without secrets, so we can ship a live demo immediately.",
+    value: "Free-model ready",
+    detail: "Uses OpenRouter's free router when configured, with a deterministic demo fallback.",
   },
   {
     label: "Coverage target",
@@ -204,5 +204,5 @@ export const statusCards: readonly StatusCard[] = [
 export const trustHighlights = [
   "Intent detection and escalation are pure functions, so the core support logic stays testable.",
   "The assistant cites the matching playbook and recommended actions instead of improvising vague replies.",
-  "The chat experience is demo-friendly, but the backend shape is ready for a real LLM provider later.",
+  "The backend can call a free OpenRouter model now and still falls back safely when credentials are missing.",
 ] as const;

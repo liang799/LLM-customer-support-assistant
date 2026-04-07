@@ -1,4 +1,5 @@
-import { createTranscriptMessage, respondToConversation } from "@/lib/support-assistant";
+import { createTranscriptMessage } from "@/lib/support-assistant";
+import { generateSupportReply } from "@/lib/support-runtime";
 import type { TranscriptMessage } from "@/lib/support-types";
 
 type ChatRequest = {
@@ -34,7 +35,7 @@ export const parseChatRequest = (body: unknown): ChatRequest | null => {
   return { messages: candidate.messages };
 };
 
-export const handleChatRequest = (body: unknown) => {
+export const handleChatRequest = async (body: unknown) => {
   const parsedBody = parseChatRequest(body);
 
   if (!parsedBody) {
@@ -46,7 +47,7 @@ export const handleChatRequest = (body: unknown) => {
     );
   }
 
-  const reply = respondToConversation(parsedBody.messages);
+  const reply = await generateSupportReply(parsedBody.messages);
   const message = createTranscriptMessage("assistant", reply.message, reply);
 
   return Response.json({ reply, message });
@@ -55,5 +56,5 @@ export const handleChatRequest = (body: unknown) => {
 export const POST = async (request: Request) => {
   const body = await request.json().catch(() => null);
 
-  return handleChatRequest(body);
+  return await handleChatRequest(body);
 };

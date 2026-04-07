@@ -25,6 +25,10 @@ export const escalationTargets = [
 
 export type EscalationTarget = (typeof escalationTargets)[number];
 
+export const supportModes = ["demo", "openrouter"] as const;
+
+export type SupportMode = (typeof supportModes)[number];
+
 export type ChatRole = "assistant" | "user";
 
 export type SupportReference = {
@@ -41,7 +45,7 @@ export type SupportReply = {
   actions: string[];
   references: SupportReference[];
   followUp: string;
-  mode: "demo";
+  mode: SupportMode;
 };
 
 export type TranscriptMessage = {
