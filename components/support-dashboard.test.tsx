@@ -58,18 +58,19 @@ describe("SupportDashboard", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
-    render(<SupportDashboard />);
+    render(<SupportDashboard initialMode="demo" />);
 
     await userEvent.click(screen.getByRole("button", { name: "Generate reply" }));
 
     expect(fetchMock).not.toHaveBeenCalled();
+    expect(screen.getByText("Mode: Demo fallback")).toBeInTheDocument();
   });
 
   it("submits a typed scenario and renders the returned insight card", async () => {
     const fetchMock = vi.fn().mockResolvedValue(buildResponse("I drafted the billing reply."));
     vi.stubGlobal("fetch", fetchMock);
 
-    render(<SupportDashboard />);
+    render(<SupportDashboard initialMode="demo" />);
 
     await userEvent.type(
       screen.getByLabelText("Customer issue"),
@@ -84,6 +85,13 @@ describe("SupportDashboard", () => {
     expect(await screen.findByText("I drafted the billing reply.")).toBeInTheDocument();
     expect(screen.getByText("Follow-up")).toBeInTheDocument();
     expect(screen.getByText("What is the invoice number?")).toBeInTheDocument();
+    expect(screen.getByText("Mode: Demo fallback")).toBeInTheDocument();
+  });
+
+  it("shows the openrouter badge when the server mode is openrouter", () => {
+    render(<SupportDashboard initialMode="openrouter" />);
+
+    expect(screen.getByText("Mode: OpenRouter free")).toBeInTheDocument();
   });
 
   it("prevents duplicate quick-prompt sends while a request is in flight", async () => {
@@ -96,7 +104,7 @@ describe("SupportDashboard", () => {
     );
     vi.stubGlobal("fetch", fetchMock);
 
-    render(<SupportDashboard />);
+    render(<SupportDashboard initialMode="demo" />);
 
     await userEvent.click(
       screen.getByRole("button", {
@@ -123,7 +131,7 @@ describe("SupportDashboard", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
 
-    render(<SupportDashboard />);
+    render(<SupportDashboard initialMode="demo" />);
 
     await userEvent.type(
       screen.getByLabelText("Customer issue"),

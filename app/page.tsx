@@ -1,5 +1,6 @@
+import { getSupportMode } from "@/lib/support-runtime";
 import { SupportDashboard } from "@/components/support-dashboard";
 
 export default function HomePage() {
-  return <SupportDashboard />;
+  return <SupportDashboard initialMode={getSupportMode()} />;
 }

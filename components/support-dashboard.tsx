@@ -9,7 +9,7 @@ import {
   createTranscriptMessage,
   getLatestInsight,
 } from "@/lib/support-assistant";
-import type { SupportReply, TranscriptMessage } from "@/lib/support-types";
+import type { SupportMode, SupportReply, TranscriptMessage } from "@/lib/support-types";
 
 type ChatResponse = {
   reply: SupportReply;
@@ -26,7 +26,14 @@ const iconByIntent = {
   unknown: "Triage",
 } as const;
 
-export function SupportDashboard() {
+const formatModeLabel = (mode: SupportMode) =>
+  mode === "openrouter" ? "OpenRouter free" : "Demo fallback";
+
+type SupportDashboardProps = {
+  initialMode: SupportMode;
+};
+
+export function SupportDashboard({ initialMode }: SupportDashboardProps) {
   const [messages, setMessages] = useState<TranscriptMessage[]>(createStarterConversation);
   const [draft, setDraft] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -35,6 +42,7 @@ export function SupportDashboard() {
 
   const latestInsight = useMemo(() => getLatestInsight(messages), [messages]);
   const busy = isReplying || isPending;
+  const activeMode = latestInsight?.mode ?? initialMode;
 
   const sendConversation = async (conversation: TranscriptMessage[]) => {
     setIsReplying(true);
@@ -135,9 +143,14 @@ export function SupportDashboard() {
               <h2>Support desk copilot</h2>
             </div>
 
-            <span className={`mode-badge mode-badge--${busy ? "busy" : "ready"}`}>
-              {busy ? "Drafting reply" : "Ready for triage"}
-            </span>
+            <div className="panel__badges">
+              <span className={`mode-badge mode-badge--${busy ? "busy" : "ready"}`}>
+                {busy ? "Drafting reply" : "Ready for triage"}
+              </span>
+              <span className={`runtime-badge runtime-badge--${activeMode}`}>
+                Mode: {formatModeLabel(activeMode)}
+              </span>
+            </div>
           </div>
 
           <div className="quick-prompts" aria-label="Demo prompts">
