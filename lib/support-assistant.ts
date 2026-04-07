@@ -7,24 +7,6 @@ import type {
   TranscriptMessage,
 } from "@/lib/support-types";
 
-const stopWords = new Set([
-  "a",
-  "an",
-  "and",
-  "be",
-  "for",
-  "has",
-  "have",
-  "i",
-  "is",
-  "it",
-  "my",
-  "of",
-  "the",
-  "to",
-  "with",
-]);
-
 const urgentKeywords = [
   "asap",
   "urgent",
@@ -50,20 +32,14 @@ const frustratedKeywords = [
 const normalizeText = (value: string) =>
   value.toLowerCase().replace(/[^a-z0-9#\s-]/g, " ").replace(/\s+/g, " ").trim();
 
-const tokenize = (value: string) =>
-  normalizeText(value)
-    .split(" ")
-    .filter((token) => token.length > 0 && !stopWords.has(token));
-
 const includesAny = (value: string, cues: readonly string[]) =>
   cues.some((cue) => normalizeText(value).includes(cue));
 
 const scorePlaybook = (message: string, playbook: SupportPlaybook) => {
-  const tokens = tokenize(message);
+  const normalized = normalizeText(message);
 
   return playbook.cues.reduce(
-    (score, cue) =>
-      tokens.some((token) => cue.includes(token) || token.includes(cue)) ? score + 1 : score,
+    (score, cue) => (normalized.includes(cue) ? score + 1 : score),
     0,
   );
 };
@@ -96,22 +72,16 @@ export const extractReference = (message: string) =>
   message.match(/\b(?:order|case|ticket|invoice)\s*#?\s*([A-Z0-9-]{4,})\b/i)?.[1]?.toUpperCase() ??
   null;
 
-const formatEscalationTarget = (target: EscalationTarget) => {
-  switch (target) {
-    case "logistics":
-      return "logistics specialist";
-    case "finance":
-      return "finance specialist";
-    case "retention":
-      return "retention desk";
-    case "identity":
-      return "identity recovery team";
-    case "priority-desk":
-      return "priority response desk";
-    default:
-      return "standard support queue";
-  }
+const escalationLabels: Record<EscalationTarget, string> = {
+  none: "standard support queue",
+  logistics: "logistics specialist",
+  finance: "finance specialist",
+  retention: "retention desk",
+  identity: "identity recovery team",
+  "priority-desk": "priority response desk",
 };
+
+const formatEscalationTarget = (target: EscalationTarget) => escalationLabels[target];
 
 const buildFallbackReply = (message: string): SupportReply => {
   const sentiment = detectSentiment(message);
