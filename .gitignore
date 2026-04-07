@@ -9,3 +9,5 @@ yarn-error.log*
 .env.local
 .env.*.local
 dist
+.idea
+.vercel
