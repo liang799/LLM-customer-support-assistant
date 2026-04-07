@@ -5,7 +5,7 @@ import { createTranscriptMessage } from "@/lib/support-assistant";
 
 describe("chat route", () => {
   it("rejects invalid request bodies", async () => {
-    const response = handleChatRequest({ nope: true });
+    const response = await handleChatRequest({ nope: true });
     const payload = await response.json();
 
     expect(parseChatRequest(null)).toBeNull();
@@ -16,7 +16,7 @@ describe("chat route", () => {
   });
 
   it("returns a support reply for valid transcripts", async () => {
-    const response = handleChatRequest({
+    const response = await handleChatRequest({
       messages: [createTranscriptMessage("user", "The item arrived broken and leaking.")],
     });
     const payload = (await response.json()) as {
